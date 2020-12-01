@@ -13,7 +13,9 @@ public class Sleeve {
 		for (int i = 0; i < board.length; i++) {
 			output += "| ";
 			for (int j = 0; j < board[i].length(); j++) {
-				output += board[i].charAt(j) + " | ";
+				String cell = Character.toString(board[i].charAt(j));
+				output += (cell.equals("X")) ? " " : "\u2022"; 
+				output += " | ";
 			}
 			output += "\n---------------------------\n";
 		}
