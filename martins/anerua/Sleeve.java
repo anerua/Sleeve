@@ -3,20 +3,12 @@ package martins.anerua;
 import java.util.Arrays;
 
 public class Sleeve {
-	static int BOARD_ROW, BOARD_COL;
-//	static int[][] ROW_CLUES = {{2,1},{6},{7},{1,3},{3,6},{10},{2,2,2},{3},{10},{7}},
-//				   COL_CLUES = {{2,1},{3,1},{3,1},{1,1,2},{5,2},{2,3,2},{7,2},{6,3},{9},{3,6}}; // 10x10 medium
-//	static int[][] ROW_CLUES = {{5,10},{1,5,11},{8,1,2,3},{2,5,12},{7,3,5},{7,3,6},{1,1,1,4,3,2},{3,5,5,2,3},{1,3,1,5,1,3},{13,3,1},
-//						{17,4},{23},{2,3,5,12},{2,2,1,1,9},{1,2,3,4,3},{5,2},{4,3,1,2,1},{3,1,6,1},{3,4,2},{3,1,8,1},{3,8,3},{1,1,2,12},{1,1,3,12},
-//						{1,2,2,10,1},{4,4,1,7},{5,3,3,7,1},{7,1,5,1,3},{3,5,2},{9,3},{11}
-//				},
-//			   COL_CLUES = {{2,3,4,1,1},{1,2,4,2},{3,3,4,3},{2,1,1,4},{3,1,1,3,5},{5,5,1,6},{6,5,2,1},{6,2,3,1},{14,1},{11,3},{9,3},
-//					   {3,4,1,3},{1,1,4,2},{3,2,2,1,2},{5,3,1,2},{4,3,1,6},{3,10,1,5},{10,1,5,5},{13,6,3},{1,1,1,8,8,1,3},{4,8,9,2},
-//					   {4,4,10,2},{2,1,1,1,4,1,7,1},{2,5,6,1,7,2},{2,4,10,9},{2,3,8,8},{2,3,1,6},{6,2,3},{3,2,1,3},{3,3,3,1,1}
-//			   };
-	static int[][] ROW_CLUES, COL_CLUES;
+	int BOARD_ROW, BOARD_COL;
+	int[][] ROW_CLUES, COL_CLUES;
+	
+	static float timeWC = 0, timeCC = 0, timeClone = 0;
 
-	public String printBoard(String[] board) {
+	public static String printBoard(String[] board) {
 		if (board.length == 1) {
 			return "Puzzle has no solution";
 		}
@@ -69,12 +61,6 @@ public class Sleeve {
 					return false;
 				}
 			} else {
-//				if (focusCol == BOARD_COL - 1) {	
-//					if (!Character.toString(row.charAt(i)).equals("1") && !emptyTarget)  {
-//						
-//						return false;
-//					}
-//				}
 				if (targetCount > 0 && targetCount != focusClue) {
 					return false;
 				}
@@ -111,11 +97,6 @@ public class Sleeve {
 					return false;
 				}
 			} else {
-//				if (focusRow == BOARD_ROW - 1) {	
-//					if (Character.toString(col.charAt(j)).equals("X") && !emptyTarget)  {
-//						return false;
-//					}
-//				}
 				if (targetCount > 0 && targetCount != focusClue) {
 					return false;
 				}
@@ -130,14 +111,18 @@ public class Sleeve {
 	}
 
 	private String writeCell(String row, String candidate, int focusCol) {
+//		long startTime = System.nanoTime();
 		String newRow = "";
 		for (int i = 0; i < row.length(); i++)
 			newRow += (i == focusCol) ? candidate : row.charAt(i);
+//		long endTime = System.nanoTime();
+//		timeWC += (float) (endTime - startTime) / 1000000000;
 		return newRow;
 	}
 
 	public String[] DFS(String[] board) {
 		int focusRow = BOARD_ROW, focusCol = BOARD_COL;
+		long timeA = System.nanoTime();
 		for (int i = 0; i < BOARD_ROW; i++) {
 			if (board[i].contains("0")) {
 				focusRow = i;
@@ -145,16 +130,24 @@ public class Sleeve {
 				break;
 			}
 		}
+		long timeB = System.nanoTime();
+		timeClone += (float) (timeB - timeA) / 1000000000;
 		if (focusRow == BOARD_ROW && focusCol == BOARD_COL) {
 			return board; // puzzle is solved
 		}
 		String[] candidates = { "1", "X" };
 		for (String candidate : candidates) {
 			String[] tempBoard = board.clone();
+			long time1 = System.nanoTime();
 			tempBoard[focusRow] = writeCell(tempBoard[focusRow], candidate, focusCol);
-			if (checkConstraint(tempBoard, focusRow, focusCol)) {
+			long time2 = System.nanoTime();
+			timeWC += (float) (time2 - time1) / 1000000000;
+			boolean constraint = checkConstraint(tempBoard, focusRow, focusCol);
+			long time3 = System.nanoTime();
+			timeCC += (float) (time3 - time2) / 1000000000;
+			if (constraint) {
 				String[] newBoard = DFS(tempBoard);
-				if (newBoard.length != 1) 
+				if (newBoard.length != 1)
 					return newBoard;
 			}
 		}
@@ -214,33 +207,20 @@ public class Sleeve {
 		String game7 = "25x25:10.2.6/13.6/2.17/3.1.6.3/15.2/5.3.4.3/1.6.3.4/1.4.4.3/2.2.1.2/1.4.1.3/2.1.3/3.6/1.2.2.1.2.1.2/4.2.9.2/4.1.8.2/4.5.2.2/1.4.2.1/7.4.1/2.2.3.1.1/11.3/5.2.6/1.2.10/3.1.4/3.2.3/7.1.5/2.3.3/3.3.1.5.1/1.4.3/2.3.3.1/2.3.1.1.1/2.3.3.3/8.3.6/3.1.4.4.6/10.1.1.1/6.1.1.1.3.3/6.1.2.3.2/5.3.1.1/5.7/5.9/3.3.10/3.3.1.5.1.1.1/1.3.4.1/1.1.3.5/1.1.1.1.4.1/4.1.1.10/6.1.1.3.5/7.3.5/3.6.2.1/2.10/2.2.1.7";
 		
 		Sleeve sv = new Sleeve();
-		sv.setGame(game7);
-//		System.out.println("column clues");
-//		for (int i = 0; i < BOARD_COL; i++) {
-//			for (int j = 0; j < COL_CLUES[i].length; j++) {
-//				System.out.print(COL_CLUES[i][j] + " ");
-//			}
-//			System.out.println();
-//		}
-//		
-//		System.out.println("row clues");
-//		for (int i = 0; i < BOARD_ROW; i++) {
-//			for (int j = 0; j < ROW_CLUES[i].length; j++) {
-//				System.out.print(ROW_CLUES[i][j] + " ");
-//			}
-//			System.out.println();
-//		}
-//		
-//		System.out.println(BOARD_ROW + " " + BOARD_COL);
+		sv.setGame(game4);
 		
-		String[] board = sv.emptyBoard(BOARD_ROW, BOARD_COL);
+		String[] board = sv.emptyBoard(sv.BOARD_ROW, sv.BOARD_COL);
 		long startTime = System.nanoTime();
 		String[] solution = sv.DFS(board);
 		long endTime = System.nanoTime();
 		float programTime = (float) (endTime - startTime) / 1000000000;
 		System.out.println("Solution: ");
-		System.out.println(sv.printBoard(solution));
+		System.out.println(printBoard(solution));
 		System.out.println("Program took:    " + programTime + " seconds.");
+		System.out.println();
+		System.out.println("Time Clone: " + (int)((timeClone/programTime)*100) + "%");
+		System.out.println("Write Cell: " + (int)((timeWC/programTime)*100) + "%");
+		System.out.println("Check Constraint: " + (int)((timeCC/programTime)*100) + "%");
 	}
 
 }
