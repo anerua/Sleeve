@@ -39,38 +39,38 @@ public class Sleeve {
 		int[] targetClues = ROW_CLUES[focusRow];
 		int clueCount = 0;
 		int focusClue = targetClues[clueCount];
-//		String row = board[focusRow];
+		String row = board[focusRow];
 		int targetCount = 0;
 		boolean emptyTarget = false;
-//		for (int i = 0; i <= focusCol; i++) {
-//			if (Character.toString(row.charAt(i)).equals("1")) {
-//				if (!emptyTarget) {
-//					++targetCount;
-//					if (targetCount == focusClue) {
-//						if ((i == BOARD_COL - 1) || (!Character.toString(row.charAt(i+1)).equals("1"))) {
-//							targetCount = 0;
-//							++clueCount;
-//							if (clueCount < targetClues.length) {
-//								focusClue = targetClues[clueCount];
-//							} else {
-//								emptyTarget = true;
-//							}
-//						} else {
-//							return false;
-//						}
-//					}
-//				} else {
-//					return false;
-//				}
-//			} else {
-//				if (targetCount > 0 && targetCount != focusClue) {
-//					return false;
-//				}
-//			}
-//		}
-//		if ((focusCol == BOARD_COL - 1) && (clueCount != targetClues.length)) {
-//			return false;
-//		}
+		for (int i = 0; i <= focusCol; i++) {
+			if (Character.toString(row.charAt(i)).equals("1")) {
+				if (!emptyTarget) {
+					++targetCount;
+					if (targetCount == focusClue) {
+						if ((i == BOARD_COL - 1) || (!Character.toString(row.charAt(i+1)).equals("1"))) {
+							targetCount = 0;
+							++clueCount;
+							if (clueCount < targetClues.length) {
+								focusClue = targetClues[clueCount];
+							} else {
+								emptyTarget = true;
+							}
+						} else {
+							return false;
+						}
+					}
+				} else {
+					return false;
+				}
+			} else {
+				if (targetCount > 0 && targetCount != focusClue) {
+					return false;
+				}
+			}
+		}
+		if ((focusCol == BOARD_COL - 1) && (clueCount != targetClues.length)) {
+			return false;
+		}
 		
 		targetClues = COL_CLUES[focusCol];
 		clueCount = 0;
@@ -236,7 +236,7 @@ public class Sleeve {
 		Map<Integer, Integer> rowClueFocus = new HashMap<Integer, Integer>();
 		
 		Sleeve sv = new Sleeve();
-		sv.setGame(game1, rowClueFocus);
+		sv.setGame(game7, rowClueFocus);
 		
 		String[] board = sv.emptyBoard(sv.BOARD_ROW, sv.BOARD_COL);
 		long startTime = System.nanoTime();
